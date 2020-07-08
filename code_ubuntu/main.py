@@ -39,16 +39,16 @@ def init_vars(path):
 if __name__ == '__main__':
     print("------ 简单自制的图书馆预约/签到脚本 -----")
     print("提示：该脚本从开始预约的日期开始到结束的日期自动帮你预约并签到两个时间段：08:00-16:00和18:00-21:00")
-    path = "..//input//input.txt"
+    path = ".//input//input.txt"
     (username,password,start_date,end_date,area,pos,email,url,aliyun_u,aliyun_p,aliyun_r) = init_vars(path)
     res_flag = 0
     sign_flag = -1
     cur = int(start_date)
     # 设置预约/签到任务
-    res_job1 = schedule.every().day.at("15:27").do(reserve,username,password,area,pos,'1530','1600',cur,url,aliyun_u,aliyun_p,aliyun_r,email)
-    res_job2 = schedule.every().day.at("15:28").do(reserve,username,password,area,pos,'1800','2100',cur,url,aliyun_u,aliyun_p,aliyun_r,email)
-    sign_job1 = schedule.every().day.at("15:31").do(signin,username,password,area,pos,'0800','1600',cur,url,aliyun_u,aliyun_p,aliyun_r,email)
-    sign_job2 = schedule.every().day.at("18:01").do(signin,username,password,area,pos,'0800','1600',cur,url,aliyun_u,aliyun_p,aliyun_r,email)
+    res_job1 = schedule.every().day.at("15:56").do(reserve,username,password,area,pos,'1600','2000',cur,url,aliyun_u,aliyun_p,aliyun_r,email)
+    res_job2 = schedule.every().day.at("15:58").do(reserve,username,password,area,pos,'2100','2130',cur,url,aliyun_u,aliyun_p,aliyun_r,email)
+    sign_job1 = schedule.every().day.at("16:01").do(signin,username,password,area,pos,'0800','1600',cur,url,aliyun_u,aliyun_p,aliyun_r,email)
+    sign_job2 = schedule.every().day.at("21:01").do(signin,username,password,area,pos,'0800','1600',cur,url,aliyun_u,aliyun_p,aliyun_r,email)
     print("----- 脚本开始 ------")
     while(True):
         schedule.run_pending()

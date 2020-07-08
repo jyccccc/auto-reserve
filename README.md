@@ -89,7 +89,12 @@ WebDriverWait(driver,10).until(EC.presence_of_element_located((By.ID,'username')
 
 ##### linux下后台执行任务
 
-- screen：很强大，相当于新建了一个窗口
+- screen：很强大，相当于新建了一个窗口，常用的几个命令：
+  `screen -S name` 启动一个名字为name的screen
+  `screen -S name -X quit` 删除某个session
+  `screen -ls` 列出所有的screen
+  `screen -r name或者id`，回到某个screen了（如不行先detached： screen -d name）
+  `ctrl + a + d` 可以回到前一个screen，当时在当前screen运行的程序不会停止
 - nohup：会将程序的输入和输出放到nohup.hut文件夹中，不适合需要交互的程序
 - &：直接后台运行，但同样不适合交互
 

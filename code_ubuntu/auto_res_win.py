@@ -21,7 +21,10 @@ class AutoRes:
     end = ''
     
     def __init__(self,username,password,area,pos,start,end,cur_date,url,aliyun_u,aliyun_p,aliyun_r,email):
-        self.driver = webdriver.Chrome(executable_path='C:\\Users\\Mar.J\\Downloads\\Compressed\\chromedriver_win32\\chromedriver.exe')
+        self.chrome_options.add_argument('--headless')
+        self.chrome_options.add_argument('--disable-gpu')
+        self.chrome_options.add_argument('--no-sandbox') # 这个配置很重要
+        self.driver = webdriver.Chrome(chrome_options=self.chrome_options,executable_path='/home/jyc/softwares/chromedriver')
         self.username = username
         self.password = password
         self.area = area

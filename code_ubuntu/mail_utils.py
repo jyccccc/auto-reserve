@@ -12,13 +12,15 @@ from time import sleep
 
 class Mail_util:
     # 发件人地址，通过控制台创建的发件人地址
-    __username = 'xxx'
+    __username = ''
     # 发件人密码，通过控制台创建的发件人密码
-    __password = 'xxx'
-    __replyto = 'xxx'
+    __password = ''
+    __replyto = ''
 
-    def __init__(self):
-        super()
+    def __init__(self,u,p,r):
+        self.__username = u
+        self.__password = p
+        self.__replyto = r
 
     # 发送邮件
     def send_email(self,header,content,receiver,ssl=0):
