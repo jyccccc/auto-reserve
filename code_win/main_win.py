@@ -5,26 +5,26 @@ import time
 
 def reserve(username,password,area,pos,start,end,cur_date,url,aliyun_u,aliyun_p,aliyun_r,email):
     dr = RES.AutoRes(username,password,area,pos,start,end,cur_date,url,aliyun_u,aliyun_p,aliyun_r,email)
-    if(dr.login()):
-        if(dr.make_res()):
-            global res_flag
-            global sign_flag
-            global cur
-            print("res_flag = %d sign_flag = %d cur = %d " % (res_flag, sign_flag,cur))
-            res_flag += 1
-            print("res_flag = %d sign_flag = %d cur = %d " % (res_flag, sign_flag,cur))
+    dr.login()
+    dr.make_res()
+    global res_flag
+    global sign_flag
+    global cur
+    print("res_flag = %d sign_flag = %d cur = %d " % (res_flag, sign_flag,cur))
+    res_flag += 1
+    print("res_flag = %d sign_flag = %d cur = %d " % (res_flag, sign_flag,cur))
     dr.driver.quit()
 
 
 def signin(username,password,area,pos,start,end,start_date,url,aliyun_u,aliyun_p,aliyun_r,email):
     dr = RES.AutoRes(username,password,area,pos,start,end,start_date,url,aliyun_u,aliyun_p,aliyun_r,email)
-    if(dr.sign_in()):
-        global res_flag
-        global sign_flag
-        global cur
-        print("res_flag = %d sign_flag = %d cur = %d " % (res_flag, sign_flag,cur))
-        sign_flag += 1
-        print("res_flag = %d sign_flag = %d cur = %d " % (res_flag, sign_flag,cur))
+    dr.sign_in()
+    global res_flag
+    global sign_flag
+    global cur
+    print("res_flag = %d sign_flag = %d cur = %d " % (res_flag, sign_flag,cur))
+    sign_flag += 1
+    print("res_flag = %d sign_flag = %d cur = %d " % (res_flag, sign_flag,cur))
     dr.driver.quit()
 
 

@@ -9,6 +9,7 @@ import time
 from time import sleep
 from selenium.webdriver.support.select import Select
 import mail_utils as MU
+import random
 
 
 class AutoRes:
@@ -45,12 +46,12 @@ class AutoRes:
         try:
             print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ': try to login ')
             self.driver.get('https://uis.nbu.edu.cn/authserver/login?service=http://zizhu.nbu.edu.cn/loginall.aspx?page=')
-            sleep(3)
+            # sleep(3)
             input_username = WebDriverWait(self.driver,5).until(EC.presence_of_element_located((By.ID,'username')))
             input_password = WebDriverWait(self.driver,5).until(EC.presence_of_element_located((By.ID,'password')))
             input_username.send_keys(self.username)
             input_password.send_keys(self.password)
-            sleep(5)
+            # sleep(5)
             self.driver.find_element_by_id('password').submit()
         except NoSuchElementException:
             print("NoSuchElementException happened, now retry %d" %(count-1))
@@ -84,93 +85,88 @@ class AutoRes:
         if(count == 0):
             print("can not reserve")
             return False
-        try:
-            areas = self.driver.find_elements_by_class_name('it')
-            # 打开区域
-            for area in areas:
-                if(area.text == self.area):
-                    area.click()
-                    break
-            sleep(5)
-            # 选择预约时间
-            WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.CLASS_NAME,'fp-date'))).click()
-            # 选择日期
-            sleep(2)
-            row = (self.cur_date - 6)/7 + 2
-            col = (self.cur_date - 5)%7
-            xpath = '//*[@id="ui-datepicker-div"]/table/tbody/tr[%d]/td[%d]' %(row,col)
-            WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,xpath))).click()
-            # 选择预约时间
-            #  h-8:21:1;  m-0:50:10
-            start_ele = WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.CLASS_NAME,'fp-time-start')))
-            self.selectTime(start_ele,int(self.start[:2]),int(self.start[2:]))
-            end_ele = WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.CLASS_NAME,'fp-time-end')))
-            self.selectTime(end_ele,int(self.end[:2]),int(self.end[2:]))
-            self.driver.find_element_by_class_name('ui-datepicker-close').click()
-            print('choose the time %s:%s-%s:%s successfully!' %(self.start[:2],self.start[2:],self.end[:2],self.end[2:]))
-            # 选择座位
-            poses = self.driver.find_elements_by_class_name("fp-dot")
-            num = len(poses)
-            rs = 0
-            for i in range(0,num):
-                titles = self.driver.find_elements_by_class_name("fp-dot")[i].get_attribute('data-original-title')
-                if(self.area+self.pos == titles):
+        WebDriverWait(self.driver,5).until(EC.presence_of_element_located((By.XPATH,'//*/h1[@class="h_title"]')))
+        areas = self.driver.find_elements_by_class_name('it')
+        # 打开区域
+        for area in areas:
+            if(area.text == self.area):
+                area.click()
+                break
+        # 选择预约时间
+        WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.CLASS_NAME,'fp-date'))).click()
+        # 选择日期
+        row = (self.cur_date - 6)/7 + 2
+        col = (self.cur_date - 5)%7
+        xpath = '//*[@id="ui-datepicker-div"]/table/tbody/tr[%d]/td[%d]' %(row,col)
+        WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,xpath))).click()
+        # 选择预约时间
+        #  h-8:21:1;  m-0:50:10
+        start_ele = WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.CLASS_NAME,'fp-time-start')))
+        self.selectTime(start_ele,int(self.start[:2]),int(self.start[2:]))
+        end_ele = WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.CLASS_NAME,'fp-time-end')))
+        self.selectTime(end_ele,int(self.end[:2]),int(self.end[2:]))
+        self.driver.find_element_by_class_name('ui-datepicker-close').click()
+        print('choose the time %s:%s-%s:%s successfully!' %(self.start[:2],self.start[2:],self.end[:2],self.end[2:]))
+        # 选择座位
+        poses = self.driver.find_elements_by_class_name("fp-dot-ok")
+        num = len(poses)
+        rs = -999
+        tmp = self.area + self.pos
+        for i in range(0,num):
+            titles = self.driver.find_elements_by_class_name("fp-dot-ok")[i].get_attribute('data-original-title')
+            if(titles is not None):
+                if(tmp == titles[:len(tmp)]):
                     rs = i
                     break
-            right_pos = self.driver.find_elements_by_class_name("fp-dot")[rs]
-            print('choose the ' + right_pos.get_attribute('data-original-title') + ' successfully!')
-            sleep(3)
-            # 预约
-            right_pos.click()
-            sleep(5)
-            WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.ID,"ui-id-1")))
-            st = self.start
-            et = self.end
-            if(self.start[0] == '0'):
-                st = self.start[1:]
-            if(self.end[0] == '0'):
-                et = self.end[1:]
-            se = "//select[@name='start_time']/option[@value='%s']" %st
-            ee = "//select[@name='end_time']/option[@value='%s']" %et
-            print(se)
-            print(ee)
-            self.driver.find_element_by_xpath('//tbody[@class="dlg_dt_panel"]/tr[2]/td[2]/div[1]/span[1]/select').click()
-            WebDriverWait(self.driver,5).until(EC.element_to_be_clickable((By.XPATH,se))).click()
-            sleep(2)
-            self.driver.find_element_by_xpath('//tbody[@class="dlg_dt_panel"]/tr[2]/td[2]/div[1]/span[3]/select').click()
-            WebDriverWait(self.driver,5).until(EC.element_to_be_clickable((By.XPATH,ee))).click()
-            sleep(3)
-            submit_btn = self.driver.find_element_by_class_name('mt_sub_resv')
-            submit_btn.click()
-            sleep(1)
-            infos = WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.XPATH,'//*[@id="uni_confirm"]/p')))
-            if(infos.text == '申请提交成功，是否跳转查看预约信息?'):
-                mail_util = MU.Mail_util(self.aliyun_u,self.aliyun_p,self.aliyun_r)
-                res_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                content = ' %s 预约%s-%s：%s-%s成功！' % (self.username,self.area,self.pos,self.start,self.end)
-                mail_util.send_email('图书馆预约通知',res_time + content,self.email)
-                print(self.username + ' reserve successfully! ')
-                return True
-            else:
-                print(infos.text)
-                return False
-        except NoSuchElementException:
-            print("NoSuchElementException happened, now retry %d" %(count-1))
-            self.driver.refresh()
-            self.make_res(count-1)
-        except StaleElementReferenceException:
-            print("StaleElementReferenceException happened, now retry %d" %(count-1))
-            self.driver.refresh()
-            self.make_res(count-1)
-        except TimeoutException:
-            print("TimeoutException happened, now retry %d" %(count-1))
-            self.driver.refresh()
-            self.make_res(count-1)
-
+        if(rs == -999):
+            right_pos = self.driver.find_elements_by_class_name("fp-dot-ok")[int(random.random()*num)]
+        else:
+            right_pos = self.driver.find_elements_by_class_name("fp-dot-ok")[rs]
+        fin_pos = right_pos.get_attribute('data-original-title')
+        print('choose the ' + fin_pos + ' successfully!')
+        # 预约
+        right_pos.click()
+        WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.ID,"ui-id-1")))
+        st = self.start
+        et = self.end
+        if(self.start[0] == '0'):
+            st = self.start[1:]
+        if(self.end[0] == '0'):
+            et = self.end[1:]
+        se = "//select[@name='start_time']/option[@value='%s']" %st
+        ee = "//select[@name='end_time']/option[@value='%s']" %et
+        print(se)
+        print(ee)
+        self.driver.find_element_by_xpath('//tbody[@class="dlg_dt_panel"]/tr[2]/td[2]/div[1]/span[1]/select').click()
+        WebDriverWait(self.driver,5).until(EC.element_to_be_clickable((By.XPATH,se))).click()
+        self.driver.find_element_by_xpath('//tbody[@class="dlg_dt_panel"]/tr[2]/td[2]/div[1]/span[3]/select').click()
+        WebDriverWait(self.driver,5).until(EC.element_to_be_clickable((By.XPATH,ee))).click()
+        submit_btn = self.driver.find_element_by_class_name('mt_sub_resv')
+        submit_btn.click()
+        infos = WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.XPATH,'//*[@id="uni_confirm"]/p')))
+        if(infos.text == '申请提交成功，是否跳转查看预约信息?'):
+            mail_util = MU.Mail_util(self.aliyun_u,self.aliyun_p,self.aliyun_r)
+            res_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            content = ' %s 预约 %s：%s-%s 成功！' % (self.username,fin_pos,self.start,self.end)
+            mail_util.send_email('图书馆预约通知',res_time + content,self.email)
+            print(self.username + ' reserve successfully! ')
+            return True
+        else:
+            print(infos.text)
+            mail_util = MU.Mail_util(self.aliyun_u,self.aliyun_p,self.aliyun_r)
+            res_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            content = ' %s 预约 %s：%s-%s 成功！' % (self.username,fin_pos,self.start,self.end)
+            mail_util.send_email('图书馆预约通知',res_time + content,self.email)
+            print(self.username + ' reserve successfully! ')
+            return False
+        
 
     def sign_in(self,count=5):
         if(count == 0):
             print("sigin in fail!")
+            mail_util = MU.Mail_util(self.aliyun_u,self.aliyun_p,self.aliyun_r)
+            content = '位置为：%s-%s 预约时间为：%s %s 结果：签到失败，请手动签到' %(self.area,self.pos,self.start,self.end)
+            mail_util.send_email('图书馆签到失败',content,self.email)
             return False
         try:
             self.driver.get(self.url)
@@ -180,19 +176,13 @@ class AutoRes:
             input_password.send_keys(self.password)
             sleep(3)
             input_password.submit()
-            sleep(3)
             WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.TAG_NAME,'button'))).click()
             flag = WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.CSS_SELECTOR,'div.info>p'))).text
             print(flag)
-            sleep(5)
-            if(flag[:4] == '签到成功'):
+            if(flag[:4] == '签到成功' or flag[:4] == '返回成功'):
                 mail_util = MU.Mail_util(self.aliyun_u,self.aliyun_p,self.aliyun_r)
-                mail_util.send_email('图书馆预约通知','签到成功了',self.email)
-                print(self.username + ' signin successfully! ')
-                return True
-            elif(flag[:4] == '返回成功'):
-                mail_util = MU.Mail_util(self.aliyun_u,self.aliyun_p,self.aliyun_r)
-                mail_util.send_email('图书馆预约通知','签到成功了',self.email)
+                content = '位置为：%s-%s 预约时间为：%s %s 结果：签到成功' %(self.area,self.pos,self.start,self.end)
+                mail_util.send_email('图书馆签到成功',content,self.email)
                 print(self.username + ' signin successfully! ')
                 return True
             else:
@@ -216,3 +206,5 @@ class AutoRes:
         Select(minute).select_by_value(str(m))
 
 
+    def if_no_pos():
+        pass
