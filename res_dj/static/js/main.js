@@ -1,3 +1,14 @@
-// 需在引入 <script src="js/jquery.cxcalendar.js"></script> 之后，调用之前设置
-$("#date_first").cxCalendar();
-$("#date_last").cxCalendar();
+function post_res() {
+  $.post("/autores/res",{
+    number: $("#number").text(),
+    password: $("#pwd").text(),
+    area: $("#area").text(),
+    pos: $("#pos").text(),
+    start: $("#start").text(),
+    end: $("#end").text(),
+    email:$("#email").text(),
+    qr:$("qr").text(),
+  },function (data,staus) {
+    alert("数据: \n" + data + "\n状态: " + status);
+  })
+}
