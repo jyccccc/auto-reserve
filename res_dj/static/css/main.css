@@ -1,0 +1,25 @@
+h1 {
+    color: #5bc0de;
+    text-align: center;
+}
+
+h3 {
+    padding-bottom: 20px;
+    text-align: center;
+}
+
+button {
+    width: 25%;
+    margin: auto;
+    padding: 20px;
+}
+
+form {
+    width: 80%;
+    margin: auto;
+}
+
+.input {
+    background: url("../img/calendar.png") no-repeat 95% center;
+    cursor:pointer;
+}
